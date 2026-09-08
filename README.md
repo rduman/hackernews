@@ -88,36 +88,3 @@ Three settings under `HackerNews` in `appsettings.json`:
 
 Development uses a 30 second interval.
 
-## Assumptions
-
-- **Top *n* by score means sorting all 200**, not sorting the first *n*. Hacker News' own order is not
-  score order.
-- **Data can be up to one refresh interval old.** Scores change constantly. This is the trade for not
-  hammering the API.
-- **`uri` can be null.** Ask HN posts have no URL. They are returned with `"uri": null` rather than
-  dropped.
-- **A missing `descendants` becomes `commentCount: 0`.** Hacker News omits the field instead of
-  sending zero.
-- **`title` is passed through as-is.** The docs describe it as HTML, so an entity could appear in it.
-- **Only stories are returned.** No comments, jobs, polls, or deleted and dead items.
-- **Asking for more than exist returns everything.** Hacker News returns 200 best stories today, but
-  the docs do not promise that number, so nothing in the code assumes it.
-- **Data is per-instance**, held in memory.
-- **No authentication**, since the brief did not ask for any.
-
-## What I would add with more time
-
-- **Tests.** The mapping edge cases, the score ordering, and one test proving that many requests do
-  not cause more upstream calls.
-- **A shared cache.** Each instance keeps its own copy, so *N* instances mean *N* times the load on
-  Hacker News. Redis plus a single refresher would fix that.
-- **Smarter refreshing.** Hacker News has a `/v0/updates` endpoint listing recently changed items.
-  Polling that, instead of refetching everything, would cut calls a lot.
-- **Proper logging.** The refresh writes plain lines to the console. `ILogger` would give levels and
-  structure.
-- **Retries and a timeout on the HTTP client.** A failed call currently just skips that story, and the
-  client uses the .NET default timeout of 100 seconds.
-- **Config validation.** A `RefreshInterval` of zero would fail at runtime rather than at startup.
-- **Output caching and rate limiting.** Neither is needed for the brief, but both would help under
-  real load.
-- **Load testing**, to put a number on the throughput claim.
