@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Santander.BestStories.Api/Santander.BestStories.Api.csproj" />
+  </Folder>
+</Solution>
